@@ -193,6 +193,10 @@ const createHashMap = () => {
   // set original hashMap to an array of size 16
   let hashMap = generateHashMap(16);
 
+  let capacity = hashMap.length;
+  let currentLoadPercentage = 0;
+  const loadFactor = 0.75;
+
   // the hash function we will use to turn keys into values
   const hash = (key) => {
     let hashCode = 0;
@@ -204,12 +208,25 @@ const createHashMap = () => {
     return hashCode;
   };
 
+  const grow = () => {
+    console.log("Growing");
+  };
+
+  const updateCurrentLoadPercentage = () => {
+    currentLoadPercentage =
+      hashMap.reduce((acc, l) => (l.size() > 0 ? acc + 1 : acc), 0) / capacity;
+    console.log(currentLoadPercentage);
+    if (currentLoadPercentage >= loadFactor) {
+      grow();
+    }
+  };
+
   const set = (key, value) => {
     // adds a new entry into the hash table
     // if collision, appends the linked list
     // if a duplicate key, updates the value
     const bucketIndex = hash(key);
-
+    console.log({ bucketIndex });
     if (hashMap[bucketIndex].size() > 0) {
       for (let i = 0; i < hashMap[bucketIndex].size(); i++) {
         if (hashMap[bucketIndex].at(i).value.key === key) {
@@ -219,6 +236,7 @@ const createHashMap = () => {
       }
     }
     hashMap[bucketIndex].appendNode({ key, value });
+    updateCurrentLoadPercentage();
   };
 
   const get = (key) => {
@@ -255,6 +273,7 @@ const createHashMap = () => {
       for (let i = 0; i < hashMap[bucketIndex].size(); i++) {
         if (hashMap[bucketIndex].at(i).value.key === key) {
           hashMap[bucketIndex].removeAt(i);
+          updateCurrentLoadPercentage();
           return true;
         }
       }
@@ -271,6 +290,7 @@ const createHashMap = () => {
 
   const clear = () => {
     hashMap = generateHashMap(16);
+    updateCurrentLoadPercentage();
   };
 
   const keys = () => {
@@ -317,25 +337,31 @@ const createHashMap = () => {
     keys,
     values,
     entries,
+    updateCurrentLoadPercentage,
   };
 };
 
 const h = createHashMap();
-h.set("darwin", "1");
-h.set("bob", "2");
-h.set("carlos", "2");
-h.set("carlos", "3");
-h.set("bobby", "4");
-h.set("johnny", "5");
-console.log(h.has("bobby"));
-h.remove("bobby");
-console.log(h.has("bobby"));
-console.log(h.length());
-const keys = h.keys();
-console.log({ keys });
-const values = h.values();
-console.log({ values });
-const entries = h.entries();
-console.log({ entries });
-h.clear();
-console.log(h.length());
+h.set("a", "");
+h.set("b", "");
+h.set("c", "");
+h.set("d", "");
+h.set("e", "");
+h.set("f", "");
+h.set("g", "");
+h.set("h", "");
+h.set("i", "");
+h.set("j", "");
+h.set("k", "");
+h.set("l", "");
+h.set("m", "");
+h.set("n", "");
+h.set("o", "");
+h.set("p", ""); // capacity is 16 at 100 percent load
+// h.set("r", "");
+// h.set("s", "");
+// h.set("t", "");
+// h.set("u", "");
+// h.set("v", "");
+// h.set("w", "");
+// h.updateCurrentLoadPercentage();
