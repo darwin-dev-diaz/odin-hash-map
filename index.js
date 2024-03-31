@@ -1,14 +1,9 @@
 import _ from "lodash";
 import { createLinkedList, createNode } from "./linkedList.js";
 
-
-
-// alright from what i understand, a hash map is an array of linked list.
-// this hash map will only deal with text values
-
 const createHashMap = () => {
-  // create a list of variable size with an empty linkedList in each position
   const generateHashMap = (bucketSize) => {
+    // create a list of variable size with an empty linkedList in each position
     const hashMap = [];
     for (let i = 0; i < bucketSize; i++) {
       hashMap.push(createLinkedList());
@@ -16,6 +11,7 @@ const createHashMap = () => {
     return hashMap;
   };
   const getHashMap = () => {
+    // this function is for testing purposes
     return hashMap;
   };
   // set original hashMap to an array of size 16
@@ -25,8 +21,8 @@ const createHashMap = () => {
   let currentLoadPercentage = 0;
   const loadFactor = 0.75;
 
-  // the hash function we will use to turn keys into values
   const hash = (key) => {
+    // the hash function we will use to turn keys into values
     let hashCode = 0;
 
     const primeNumber = 31;
@@ -40,7 +36,13 @@ const createHashMap = () => {
     // adds a new entry into the hash table
     // if collision, appends the linked list
     // if a duplicate key, updates the value
+
+    // this makes sure that we don't access an index not within capacity
     const bucketIndex = hash(key);
+    if (bucketIndex < 0 || bucketIndex >= hashMap.length) {
+      throw new Error("Trying to access index out of bound");
+    }
+    
     if (hashMap[bucketIndex].size() > 0) {
       for (let i = 0; i < hashMap[bucketIndex].size(); i++) {
         if (hashMap[bucketIndex].at(i).value.key === key) {
@@ -56,7 +58,13 @@ const createHashMap = () => {
   const get = (key) => {
     // takes a key and returns the value assigned to this key
     // if no key is found, return null
+    
+    // this makes sure that we don't access an index not within capacity
     const bucketIndex = hash(key);
+    if (bucketIndex < 0 || bucketIndex >= hashMap.length) {
+      throw new Error("Trying to access index out of bound");
+    }
+
     if (hashMap[bucketIndex].size() > 0) {
       for (let i = 0; i < hashMap[bucketIndex].size(); i++) {
         if (hashMap[bucketIndex].at(i).value.key === key) {
@@ -69,7 +77,14 @@ const createHashMap = () => {
   };
 
   const has = (key) => {
+    // if the key is stored somewhere in our hashMap, return true
+    // if the key is not stored somewhere in our hashMap, return false 
+
+    // this makes sure that we don't access an index not within capacity
     const bucketIndex = hash(key);
+    if (bucketIndex < 0 || bucketIndex >= hashMap.length) {
+      throw new Error("Trying to access index out of bound");
+    }
     if (hashMap[bucketIndex].size() > 0) {
       for (let i = 0; i < hashMap[bucketIndex].size(); i++) {
         if (hashMap[bucketIndex].at(i).value.key === key) {
@@ -82,7 +97,14 @@ const createHashMap = () => {
   };
 
   const remove = (key) => {
+    // this function removes a key-pair in our hashMap
+    // if the key is not found return false
+
+    // this makes sure that we don't access an index not within capacity
     const bucketIndex = hash(key);
+    if (bucketIndex < 0 || bucketIndex >= hashMap.length) {
+      throw new Error("Trying to access index out of bound");
+    }
     if (hashMap[bucketIndex].size() > 0) {
       for (let i = 0; i < hashMap[bucketIndex].size(); i++) {
         if (hashMap[bucketIndex].at(i).value.key === key) {
@@ -97,17 +119,23 @@ const createHashMap = () => {
   };
 
   const length = () => {
+    // return the total number of keys within our function
+
     let totalKeys = 0;
     hashMap.forEach((l) => (totalKeys += l.size()));
     return totalKeys;
   };
 
   const clear = () => {
+    // resets our hashMap back to a clear hashMap of 16 buckets
+
     hashMap = generateHashMap(16);
     updateCurrentLoadPercentage();
   };
 
   const keys = () => {
+    // returns all the keys in our hashmap as an array
+
     const keyArr = [];
     hashMap.forEach((l) => {
       for (let i = 0; i < l.size(); i++) {
@@ -118,6 +146,8 @@ const createHashMap = () => {
   };
 
   const values = () => {
+    // returns the values of our hashMap in an array
+
     const valueArr = [];
     hashMap.forEach((l) => {
       for (let i = 0; i < l.size(); i++) {
@@ -128,6 +158,8 @@ const createHashMap = () => {
   };
 
   const entries = () => {
+    // returns the entry pairs [key, values] in an array
+
     const entriesArr = [];
     hashMap.forEach((l) => {
       for (let i = 0; i < l.size(); i++) {
@@ -141,6 +173,11 @@ const createHashMap = () => {
   };
 
   const grow = () => {
+    // doubles the size of our available buckets
+    // updates our capacity
+    // re-hashes all of our keys and sets the (keys, value) pairs back into our bigger hashMap
+    // updates the currentLoadPercentage 
+    // console.log("growing");
     const entriesArr = entries();
     hashMap = generateHashMap(hashMap.length * 2);
     capacity = hashMap.length;
@@ -152,6 +189,9 @@ const createHashMap = () => {
   };
 
   const updateCurrentLoadPercentage = () => {
+    // updates current load percentage
+    // if the current load is above our load factor,
+    // grow our hashMap
     currentLoadPercentage =
       hashMap.reduce((acc, l) => (l.size() > 0 ? acc + 1 : acc), 0) / capacity;
     // console.log({ currentLoadPercentage });
@@ -173,21 +213,3 @@ const createHashMap = () => {
     entries,
   };
 };
-
-const h = createHashMap();
-h.set("a", "");
-h.set("b", "");
-h.set("c", "");
-h.set("d", "");
-h.set("e", "");
-h.set("f", "");
-h.set("g", "");
-h.set("h", "");
-h.set("i", "");
-h.set("j", "");
-h.set("k", "");
-h.set("l", ""); // 75 percent load
-h.set("m", "");
-// h.updateCurrentLoadPercentage()
-console.log(h.has("m"))
-console.log(h.has("m"))
