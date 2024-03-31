@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { createLinkedList, createNode } from "./linkedList.js";
+import { createLinkedList } from "./linkedList.js";
 
 const createHashMap = () => {
   const generateHashMap = (bucketSize) => {

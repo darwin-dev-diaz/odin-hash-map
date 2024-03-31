@@ -177,4 +177,4 @@ function createNode(value = null, next = null) {
   return { value, next };
 }
 
-export {createLinkedList, createNode}
+export {createLinkedList}
