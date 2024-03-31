@@ -27,7 +27,7 @@ function createLinkedList() {
   };
 
   const size = () => {
-    if (!linkedList.head.next) return 1;
+    if (Object.values(linkedList.head).length === 0) return 0;
 
     let counter = 1;
     let currentNode = linkedList.head;
@@ -74,7 +74,8 @@ function createLinkedList() {
   const contains = (value) => {
     let currentNode = linkedList.head;
     while (true) {
-      if(typeof value === "object" && _.isEqual(value, currentNode.value)) return true
+      if (typeof value === "object" && _.isEqual(value, currentNode.value))
+        return true;
       else if (currentNode.value === value) return true;
       if (!currentNode.next) break;
       currentNode = currentNode.next;
@@ -85,7 +86,9 @@ function createLinkedList() {
     let currentNode = linkedList.head;
     let index = 0;
     while (true) {
-      if (currentNode.value === value) return index;
+      if (typeof value === "object" && _.isEqual(value, currentNode.value))
+        return index;
+      else if (currentNode.value === value) return index;
       if (!currentNode.next) break;
       currentNode = currentNode.next;
       index++;
@@ -201,18 +204,138 @@ const createHashMap = () => {
     return hashCode;
   };
 
-  // adds a new entry into the hash table
-  // if key already exist (not just the hash code, but the actual key) then just update the value
   const set = (key, value) => {
-    console.log({index: hash(key)});
-    hashMap[hash(key)].appendNode({ key, value });
+    // adds a new entry into the hash table
+    // if collision, appends the linked list
+    // if a duplicate key, updates the value
+    const bucketIndex = hash(key);
+
+    if (hashMap[bucketIndex].size() > 0) {
+      for (let i = 0; i < hashMap[bucketIndex].size(); i++) {
+        if (hashMap[bucketIndex].at(i).value.key === key) {
+          hashMap[bucketIndex].at(i).value.value = value;
+          return;
+        }
+      }
+    }
+    hashMap[bucketIndex].appendNode({ key, value });
   };
 
-  return { getHashMap, set };
+  const get = (key) => {
+    // takes a key and returns the value assigned to this key
+    // if no key is found, return null
+    const bucketIndex = hash(key);
+    if (hashMap[bucketIndex].size() > 0) {
+      for (let i = 0; i < hashMap[bucketIndex].size(); i++) {
+        if (hashMap[bucketIndex].at(i).value.key === key) {
+          return hashMap[bucketIndex].at(i).value.value;
+        }
+      }
+    }
+
+    return null;
+  };
+
+  const has = (key) => {
+    const bucketIndex = hash(key);
+    if (hashMap[bucketIndex].size() > 0) {
+      for (let i = 0; i < hashMap[bucketIndex].size(); i++) {
+        if (hashMap[bucketIndex].at(i).value.key === key) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
+  const remove = (key) => {
+    const bucketIndex = hash(key);
+    if (hashMap[bucketIndex].size() > 0) {
+      for (let i = 0; i < hashMap[bucketIndex].size(); i++) {
+        if (hashMap[bucketIndex].at(i).value.key === key) {
+          hashMap[bucketIndex].removeAt(i);
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
+  const length = () => {
+    let totalKeys = 0;
+    hashMap.forEach((l) => (totalKeys += l.size()));
+    return totalKeys;
+  };
+
+  const clear = () => {
+    hashMap = generateHashMap(16);
+  };
+
+  const keys = () => {
+    const keyArr = [];
+    hashMap.forEach((l) => {
+      for (let i = 0; i < l.size(); i++) {
+        keyArr.push(l.at(i).value.key);
+      }
+    });
+    return keyArr;
+  };
+
+  const values = () => {
+    const valueArr = [];
+    hashMap.forEach((l) => {
+      for (let i = 0; i < l.size(); i++) {
+        valueArr.push(l.at(i).value.value);
+      }
+    });
+    return valueArr;
+  };
+
+  const entries = () => {
+    const entriesArr = [];
+    hashMap.forEach((l) => {
+      for (let i = 0; i < l.size(); i++) {
+        const pushArr = [];
+        pushArr.push(l.at(i).value.key);
+        pushArr.push(l.at(i).value.value);
+        entriesArr.push(pushArr);
+      }
+    });
+    return entriesArr;
+  };
+
+  return {
+    getHashMap,
+    set,
+    get,
+    has,
+    remove,
+    length,
+    clear,
+    keys,
+    values,
+    entries,
+  };
 };
 
 const h = createHashMap();
-h.set("te4324gfdsgf1st", "value of test");
-h.set("tes5643765gfdt", "value of test");
-// h.getHashMap().forEach(b=>console.log(b.toString()));
-console.log(h.getHashMap()[3].at(1).value)
+h.set("darwin", "1");
+h.set("bob", "2");
+h.set("carlos", "2");
+h.set("carlos", "3");
+h.set("bobby", "4");
+h.set("johnny", "5");
+console.log(h.has("bobby"));
+h.remove("bobby");
+console.log(h.has("bobby"));
+console.log(h.length());
+const keys = h.keys();
+console.log({ keys });
+const values = h.values();
+console.log({ values });
+const entries = h.entries();
+console.log({ entries });
+h.clear();
+console.log(h.length());
